@@ -16,14 +16,14 @@
  * Implementation of hook_filter().
  */
 
-function pathologic_filter($op, $delta = 0, $format = -1, $text = "") {
+function pathologic_filter($op, $delta = 0, $format = -1, $text = '') {
 	if ($op === 'process' && $text !== '') {
 		if (variable_get("filter_pathologic_href_{$format}", TRUE)) {
 			// Do transformation on HREF paths
 			// Make relative
 			$text = preg_replace_callback(_pathologic_abs_regex('href', $format), '_pathologic_abs_to_rel', $text);
 			// Transform attributes
-			$text = preg_replace_callback('|href="([^/][^#:"]+)#?([^:"]*)"|', '_pathologic_do_href', $text);
+			$text = preg_replace_callback('|href="([^/#][^:"#]+)#?([^:"]*)"|', '_pathologic_do_href', $text);
 		}
 		if (variable_get("filter_pathologic_src_{$format}", TRUE)) {
 			// Do transformation on SRC paths
@@ -153,24 +153,24 @@ function _pathologic_do_src($matches) {
 }
 
 /**
- * This is an unabashed hack.
+ * Run the parts through url() if they look like they link to a local Drupal
+ * path. Otherwise, it's a link to a file or something -- try to return it
+ * in one piece.
  *
- * The only difference between Drupal 5 and Drupal 6, as far as this module is
- * concerned, is that they call the url() function in different ways. Rather
- * than have two versions of the code with ever-so-minute differences strewn
- * about, I can just wrap the calls to url() in a function like this which
- * checks Drupal's version, then calls the function differently depending on
- * whether Drupal is running version 5 (or earlier) or version 6 (or later).
+ * Okay, here's where the major changes are in the D5 version. menu_get_item()
+ * has different parameters, and returns an empty array on failure.
  */
 
 function _pathologic_url($path, $fragment = NULL) {
-	static $five = NULL;
-	if ($five === NULL) {
-		$five = intval(VERSION) < 6;
+	// Does this look like an internal URL?
+	if ($path !== '<front>' && count(menu_get_item(NULL, $path)) === 0 && drupal_get_path_alias($path) === $path) {
+		// It's not.
+		global $base_url;
+		$return = $base_url . '/' . $path;
+		if ($fragment !== NULL) {
+			$return .= '#' . $fragment;
+		}
+		return $return;
 	}
-	if ($five) {
-		// I typically shun the ternary operator, but it fits here.
-		return url($path, NULL, $fragment === '' ? NULL : $fragment, TRUE);
-	}
-	return url($path, array('fragment' => $fragment, 'absolute' => TRUE));
+	return url($path, NULL, $fragment === '' ? NULL : $fragment, TRUE);
 }

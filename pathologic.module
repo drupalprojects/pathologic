@@ -89,7 +89,7 @@ function _pathologic($text, $format) {
       // $filter->settings['absolute'] to the replacement function. We could
       // just put the whole replacement function here, but that would just be
       // silly.
-      'callback' => create_function('$matches', 'return _pathologic_replace($matches, ' . variable_get('filter_pathologic_absolute_' . $format, 'TRUE') . ');'),
+      'callback' => create_function('$matches', 'return _pathologic_replace($matches, ' . variable_get('filter_pathologic_absolute_' . $format, TRUE) . ');'),
     );
   }
   return preg_replace_callback($statics[$format]['pattern'], $statics[$format]['callback'], $text);

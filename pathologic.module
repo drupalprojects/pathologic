@@ -89,7 +89,7 @@ function _pathologic($text, $format) {
       // $filter->settings['absolute'] to the replacement function. We could
       // just put the whole replacement function here, but that would just be
       // silly.
-      'callback' => create_function('$matches', 'return _pathologic_replace($matches, ' . variable_get('filter_pathologic_absolute_' . $format, TRUE) . ');'),
+      'callback' => create_function('$matches', 'return _pathologic_replace($matches, ' . (variable_get('filter_pathologic_absolute_' . $format, TRUE) ? 'TRUE' : 'FALSE') . ');'),
     );
   }
   return preg_replace_callback($statics[$format]['pattern'], $statics[$format]['callback'], $text);
@@ -119,25 +119,18 @@ function _pathologic_replace($matches, $absolute) {
     }
   }
   else {
-    $qparts = array();
+    $qparts = NULL;
   }
-  
-  // Check if this is a menu item. If yes, we want to try to translate the path.
-  if (menu_get_item($parts['path'])) {
-    global $language;
-  }
-  else {
-    $language = NULL;
-    // On multi-lingual sites, language_url_rewrite() will be called and may
-    // rewrite the link in ways we don't want:
+
+  // Attempt to correctly handle language issues
+  // http://drupal.org/node/348421
+  global $language;
+  $lang_to_use = drupal_clone($language);
+
+  if (!menu_get_item($parts['path'])) {
+    // If it's not a menu item, don't mangle the path!
     // http://drupal.org/node/961618
-    // So here's a stupid workaround to detect if that's probably about to
-    // happen and temporarily override a variable to stop that.
-    $orig_lang_neg = variable_get('language_negotiation', LANGUAGE_NEGOTIATION_NONE);
-    if ($orig_lang_neg !== LANGUAGE_NEGOTIATION_NONE) {
-      global $conf;
-      $conf['language_negotiation'] = LANGUAGE_NEGOTIATION_NONE;
-    }
+    $lang_to_use->prefix = '';
   }
 
   $url = url(
@@ -146,14 +139,9 @@ function _pathologic_replace($matches, $absolute) {
       'query' => $qparts,
       'fragment' => isset($parts['fragment']) ? $parts['fragment'] : NULL,
       'absolute' => $absolute,
-      'language' => $language,
+      'language' => $lang_to_use,
     )
   );
-
-  // Reset the language_negotiation variable if necessary.
-  if (isset($conf)) {
-    $conf['language_negotiation'] = $orig_lang_neg;
-  }
 
   // $matches[1] will be "src" or "href"
   return "{$matches[1]}=\"{$url}\"";

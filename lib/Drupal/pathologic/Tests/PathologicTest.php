@@ -2,28 +2,25 @@
 
 /**
  * @file
- * Pathologic behavior testing.
+ * Definition of Drupal\pathologic\Tests\PathologicTest.
  */
 
-/**
- * Tests that Pathologic ain't broke.
- *
- * We extend FilterUnitTestCase because it has some nice methods that we also
- * want to be able to use.
- *
- * Note to self: The method to pass bits of text through are fail() or pass().
- */
-class PathologicTestCase extends DrupalWebTestCase {
+namespace Drupal\pathologic\Tests;
+
+use Drupal\simpletest\WebTestBase;
+// @todo Remove this when no longer needed.
+use \stdClass;
+
+class PathologicTest extends WebTestBase {
+
+  public static $modules = array('filter', 'pathologic');
+  
   public static function getInfo() {
     return array(
-      'name' => 'Pathologic path filtering',
-      'description' => 'Test Pathologic&rsquo;s path translation and conversion.',
+      'name' => 'Pathologic',
+      'description' => 'Tests Pathologic functionality.',
       'group' => 'Filter',
     );
-  }
-
-  function setUp() {
-    parent::setUp('pathologic');
   }
 
   function testPathologic() {
@@ -220,8 +217,6 @@ class PathologicTestCase extends DrupalWebTestCase {
       strpos($filtered_tag, 'q=') === FALSE,
       t('Paths to files don\'t have ?q= when clean URLs are off')
     );
-
-
   }
 }
 

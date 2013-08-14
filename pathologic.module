@@ -7,6 +7,17 @@
  * This input filter attempts to make sure that link and image paths will
  * always be correct, even when domain names change, content is moved from one
  * server to another, the Clean URLs feature is toggled, etc.
+ *
+ * @todo for D8
+ * - Account for new way dirty URLs are done (no more clean_url variable)
+ * - - We can now tell url() to create clean or dirty URLs regardless of current
+ *     status!
+ * - - Our path parsing code needs to account for both new and old dirty URL
+ *     styles
+ * - - Option to force output of clean or dirty URLs?
+ * - Move _pathologic_filter() code into the actual filter class 
+ * - Do DOM object manipulation instead of preg_replace(). It's what core
+ *   filters are doing now.
  */
 
 /**
@@ -31,7 +42,7 @@ function _pathologic_filter($text, $settings, $hash) {
     if ($settings['local_paths'] !== '') {
       // Build an array of the exploded local paths for this format's settings.
       // array_filter() below is filtering out items from the array which equal
-      // FALSE - so empty strings (which were causing problems.
+      // FALSE - so empty strings, which were causing problems.
       // @see http://drupal.org/node/1727492
       $local_paths = array_filter(array_map('trim', explode("\n", $settings['local_paths'])));
       foreach ($local_paths as $local) {
@@ -266,23 +277,15 @@ function _pathologic_replace($matches) {
   }
 
   // Okay, deal with language stuff.
-  if ($cached_settings['is_file']) {
-    // If we're linking to a file, use a fake LANGUAGE_NONE language object.
-    // Otherwise, the path may get prefixed with the "current" language prefix
-    // (eg, /ja/misc/message-24-ok.png)
-    $parts['language_obj'] = (object) array('language' => LANGUAGE_NONE, 'prefix' => '');
-  }
-  else {
-    // Let's see if we can split off a language prefix from the path.
-    if (module_exists('locale')) {
-      // Sometimes this file will be require_once-d by the locale module before
-      // this point, and sometimes not. We require_once it ourselves to be sure.
-      require_once DRUPAL_ROOT . '/includes/language.inc';
-      list($language_obj, $path) = language_url_split_prefix($parts['path'], language_list());
-      if ($language_obj) {
-        $parts['path'] = $path;
-        $parts['language_obj'] = $language_obj;
-      }
+  // Let's see if we can split off a language prefix from the path.
+  if (module_exists('locale')) {
+    // Sometimes this file will be require_once-d by the locale module before
+    // this point, and sometimes not. We require_once it ourselves to be sure.
+    require_once DRUPAL_ROOT . '/includes/language.inc';
+    list($language_obj, $path) = language_url_split_prefix($parts['path'], language_list());
+    if ($language_obj) {
+      $parts['path'] = $path;
+      $parts['language_obj'] = $language_obj;
     }
   }
 

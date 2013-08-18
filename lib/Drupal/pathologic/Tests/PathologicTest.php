@@ -13,7 +13,7 @@ use Drupal\Core\Language\Language;
 
 class PathologicTest extends WebTestBase {
 
-  public static $modules = array('filter', 'pathologic');
+  public static $modules = array('filter', 'pathologic', 'pathologic_test');
   
   public static function getInfo() {
     return array(
@@ -236,22 +236,4 @@ function _pathologic_content_url($path, $options) {
   }
 
   return check_plain(url(htmlspecialchars_decode($path), $options));
-}
-
-/**
- * Implements hook_pathologic_alter(), for testing that functionality.
- */
-function pathologic_pathologic_alter(&$url_params, $parts, $settings) {
-  if (is_array($parts['qparts']) && isset($parts['qparts']['test'])) {
-    if ($parts['qparts']['test'] === 'add_foo_qpart') {
-      // Add a "foo" query part
-      if (empty($url_params['options']['query'])) {
-        $url_params['options']['query'] = array();
-      }
-      $url_params['options']['query']['foo'] = 'bar';
-    }
-    elseif ($parts['qparts']['test'] === 'use_original') {
-      $url_params['options']['use_original'] = TRUE;
-    }
-  }
 }

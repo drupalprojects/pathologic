@@ -10,6 +10,7 @@ namespace Drupal\pathologic\Plugin\Filter;
 use Drupal\filter\Annotation\Filter;
 use Drupal\Core\Annotation\Translation;
 use Drupal\filter\Plugin\FilterBase;
+use Drupal\Component\Utility\Crypt;
 
 /**
  * Attempts to correct broken paths in content.
@@ -64,7 +65,7 @@ class FilterPathologic extends FilterBase {
    */
   public function process($text, $langcode, $cache, $cache_id) {
     // @todo Move code from .module file to inside here.
-    return _pathologic_filter($text, $this->settings, spl_object_hash($this));
+    return _pathologic_filter($text, $this->settings, Crypt::hashBase64(serialize($this->settings)));
   }
 
 }

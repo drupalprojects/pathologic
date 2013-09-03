@@ -107,6 +107,16 @@ class PathologicTest extends WebTestBase {
           t('Simple paths. Clean URLs: !clean; protocol style: !ps.', $t10ns)
         );
         $this->assertEqual(
+          $filter->process('<a href="index.php?q=foo"></a><a href="index.php?q=foo/bar&baz=qux"></a>', Language::LANGCODE_NOT_SPECIFIED, NULL, NULL),
+          '<a href="' . $paths['foo'] . '"></a><a href="' . $paths['foo/bar?baz=qux'] . '"></a>',
+          t('D7 and earlier-style non-clean URLs. Clean URLs: !clean; protocol style: !ps.', $t10ns)
+        );
+        $this->assertEqual(
+          $filter->process('<a href="index.php/foo"></a><a href="index.php/foo/bar?baz=qux"></a>', Language::LANGCODE_NOT_SPECIFIED, NULL, NULL),
+          '<a href="' . $paths['foo'] . '"></a><a href="' . $paths['foo/bar?baz=qux'] . '"></a>',
+          t('D8-style non-clean URLs. Clean URLs: !clean; protocol style: !ps.', $t10ns)
+        );
+        $this->assertEqual(
           $filter->process('<form action="foo/bar?baz"><IMG LONGDESC="foo/bar?baz=qux" /></a>', Language::LANGCODE_NOT_SPECIFIED, NULL, NULL),
           '<form action="' . $paths['foo/bar?baz'] . '"><IMG LONGDESC="' . $paths['foo/bar?baz=qux'] . '" /></a>',
           t('Paths with query string. Clean URLs: !clean; protocol style: !ps.', $t10ns)

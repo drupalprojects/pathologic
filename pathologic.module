@@ -241,7 +241,7 @@ function _pathologic_replace($matches) {
 
   // Okay, format the URL.
   // If there's still a slash lingering at the start of the path, chop it off.
-  $parts['path'] = ltrim($parts['path'],'/');
+  $parts['path'] = ltrim($parts['path'], '/');
 
   // Examine the query part of the URL. Break it up and look through it; if it
   // has a value for "q", we want to use that as our trimmed path, and remove it
@@ -270,10 +270,16 @@ function _pathologic_replace($matches) {
     return $matches[0];
   }
 
+  // If this looks like a D8-style unclean URL, crop off the "index.php/" from
+  // the beginning.
+  if (strpos($parts['path'], 'index.php/') === 0) {
+    $parts['path'] = substr($parts['path'], 10);
+  }
+
   // If we didn't previously identify this as a file, check to see if the file
   // exists now that we have the correct path relative to DRUPAL_ROOT
-  if (!$cached_settings['is_file']){
-    $cached_settings['is_file'] = !empty($parts['path']) && is_file(DRUPAL_ROOT . '/'. $parts['path']);
+  if (!$cached_settings['is_file']) {
+    $cached_settings['is_file'] = !empty($parts['path']) && is_file(DRUPAL_ROOT . '/' . $parts['path']);
   }
 
   // Okay, deal with language stuff.

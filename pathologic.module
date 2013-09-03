@@ -287,7 +287,7 @@ function _pathologic_replace($matches) {
   if (module_exists('locale')) {
     // Sometimes this file will be require_once-d by the locale module before
     // this point, and sometimes not. We require_once it ourselves to be sure.
-    require_once DRUPAL_ROOT . '/includes/language.inc';
+    require_once DRUPAL_ROOT . '/core/includes/language.inc';
     list($language_obj, $path) = language_url_split_prefix($parts['path'], language_list());
     if ($language_obj) {
       $parts['path'] = $path;

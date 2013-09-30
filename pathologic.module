@@ -103,7 +103,7 @@ function _pathologic_filter($text, $settings, $hash) {
   // is not perfect, but the callback will do more checking to make sure the
   // paths it receives make sense to operate upon, and just return the original
   // paths if not.
-  return preg_replace_callback('~(href|src|action|longdesc)="([^"]+)~i', '_pathologic_replace', $text);
+  return preg_replace_callback('~ (href|src|action|longdesc)="([^"]+)~i', '_pathologic_replace', $text);
 }
 
 /**
@@ -376,7 +376,7 @@ function _pathologic_replace($matches) {
   // @see http://drupal.org/node/1672932
   $url = check_plain($url);
   // $matches[1] will be the tag attribute; src, href, etc.
-  return "{$matches[1]}=\"{$url}";
+  return " {$matches[1]}=\"{$url}";
 }
 
 /**

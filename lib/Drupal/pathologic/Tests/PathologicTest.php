@@ -39,7 +39,7 @@ class PathologicTest extends WebTestBase {
     );
 
     // Build a phony filter
-    $filter = new FilterPathologic(array('settings' => array('protocol_style' => 'full', 'local_paths' => '')), 'foo', array('module' => 'pathologic', 'cache' => FALSE));
+    $filter = new FilterPathologic(array('settings' => array('protocol_style' => 'full', 'local_paths' => '')), 'foo', array('provider' => 'pathologic', 'cache' => FALSE));
 
     // Build some paths to check against
     $test_paths = array(

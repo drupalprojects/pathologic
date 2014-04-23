@@ -129,7 +129,13 @@ class PathologicTest extends WebTestBase {
         $this->assertEqual(
           $filter->process('<a href="#foo">', Language::LANGCODE_NOT_SPECIFIED, NULL, NULL),
           '<a href="#foo">',
-          t('Fragment-only links. Clean URLs: !clean; protocol style: !ps.', $t10ns)
+          t('Fragment-only href. Clean URLs: !clean; protocol style: !ps.', $t10ns)
+        );
+        // @see https://drupal.org/node/2208223
+        $this->assertEqual(
+          $filter->process('<a href="#">', Language::LANGCODE_NOT_SPECIFIED, NULL, NULL),
+          '<a href="#">',
+          t('Hash-only href. Clean URLs: !clean; protocol style: !ps.', $t10ns)
         );
         $this->assertEqual(
           $filter->process('<a href="foo/bar?baz=qux&amp;quux=quuux#quuuux">', Language::LANGCODE_NOT_SPECIFIED, NULL, NULL),

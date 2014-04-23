@@ -19,7 +19,7 @@ use Drupal\Component\Utility\Crypt;
  *   id = "filter_pathologic",
  *   module = "pathologic",
  *   title = @Translation("Correct URLs with Pathologic"),
- *   type = FILTER_TYPE_TRANSFORM_IRREVERSIBLE,
+ *   type = Drupal\filter\Plugin\FilterInterface::TYPE_TRANSFORM_IRREVERSIBLE,
  *   settings = {
  *     "local_paths" = "",
  *     "protocol_style" = "full"

@@ -19,6 +19,7 @@
  * - Do DOM object manipulation instead of preg_replace(). It's what core
  *   filters are doing now.
  */
+use Drupal\Component\Utility\String;
 
 /**
  * Pathologic filter callback.
@@ -288,7 +289,7 @@ function _pathologic_replace($matches) {
 
   // Okay, deal with language stuff.
   // Let's see if we can split off a language prefix from the path.
-  if (module_exists('locale')) {
+  if (\Drupal::moduleHandler()->moduleExists('locale')) {
     // Sometimes this file will be require_once-d by the locale module before
     // this point, and sometimes not. We require_once it ourselves to be sure.
     require_once DRUPAL_ROOT . '/core/includes/language.inc';
@@ -329,7 +330,7 @@ function _pathologic_replace($matches) {
 
   // Now alter!
   // @see http://drupal.org/node/1762022
-  drupal_alter('pathologic', $url_params, $parts, $cached_settings);
+  \Drupal::moduleHandler()->alter('pathologic', $url_params, $parts, $cached_settings);
 
   // If any of the alter hooks asked us to just pass along the original URL,
   // then do so.
@@ -376,7 +377,7 @@ function _pathologic_replace($matches) {
 
   // Apply HTML character encoding, as is required for HTML attributes.
   // @see http://drupal.org/node/1672932
-  $url = check_plain($url);
+  $url = String::checkPlain($url);
   // $matches[1] will be the tag attribute; src, href, etc.
   return " {$matches[1]}=\"{$url}";
 }

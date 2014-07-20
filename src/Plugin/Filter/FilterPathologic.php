@@ -9,6 +9,7 @@ namespace Drupal\pathologic\Plugin\Filter;
 
 use Drupal\filter\Annotation\Filter;
 use Drupal\Core\Annotation\Translation;
+use Drupal\filter\FilterProcessResult;
 use Drupal\filter\Plugin\FilterBase;
 use Drupal\Component\Utility\Crypt;
 
@@ -62,9 +63,9 @@ class FilterPathologic extends FilterBase {
   /**
    * {@inheritdoc}
    */
-  public function process($text, $langcode, $cache, $cache_id) {
+  public function process($text, $langcode) {
     // @todo Move code from .module file to inside here.
-    return _pathologic_filter($text, $this->settings, Crypt::hashBase64(serialize($this->settings)));
+    return new FilterProcessResult(_pathologic_filter($text, $this->settings, Crypt::hashBase64(serialize($this->settings))));
   }
 
 }

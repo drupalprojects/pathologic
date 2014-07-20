@@ -7,21 +7,19 @@
 
 namespace Drupal\pathologic\Tests;
 
+use Drupal\Component\Utility\String;
 use Drupal\simpletest\WebTestBase;
 use Drupal\pathologic\Plugin\Filter\FilterPathologic;
 use Drupal\Core\Language\Language;
 
+/**
+ * Tests Pathologic functionality.
+ *
+ * @group filter
+ */
 class PathologicTest extends WebTestBase {
 
   public static $modules = array('filter', 'pathologic', 'pathologic_test');
-  
-  public static function getInfo() {
-    return array(
-      'name' => 'Pathologic',
-      'description' => 'Tests Pathologic functionality.',
-      'group' => 'Filter',
-    );
-  }
 
   function testPathologic() {
     global $script_path;
@@ -251,5 +249,5 @@ function _pathologic_content_url($path, $options) {
     $options['script_path'] = '';
   }
 
-  return check_plain(url(htmlspecialchars_decode($path), $options));
+  return String::checkPlain(url(htmlspecialchars_decode($path), $options));
 }

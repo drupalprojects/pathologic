@@ -7,11 +7,10 @@
 
 namespace Drupal\pathologic\Plugin\Filter;
 
-use Drupal\filter\Annotation\Filter;
-use Drupal\Core\Annotation\Translation;
 use Drupal\filter\FilterProcessResult;
 use Drupal\filter\Plugin\FilterBase;
 use Drupal\Component\Utility\Crypt;
+use Drupal\Core\Form\FormStateInterface;
 
 /**
  * Attempts to correct broken paths in content.
@@ -32,7 +31,7 @@ class FilterPathologic extends FilterBase {
   /**
    * {@inheritdoc}
    */
-  public function settingsForm(array $form, array &$form_state) {
+  public function settingsForm(array $form, FormStateInterface $form_state) {
     $form['reminder'] = array(
       '#type' => 'item',
       '#title' => t('In most cases, Pathologic should be the <em>last</em> filter in the &ldquo;Filter processing order&rdquo; list.'),

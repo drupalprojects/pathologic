@@ -8,19 +8,23 @@
  * always be correct, even when domain names change, content is moved from one
  * server to another, the Clean URLs feature is toggled, etc.
  *
- * @todo for D8
+ * @todo for Pathlogic 8.x-2.x
  * - Account for new way dirty URLs are done (no more clean_url variable)
  * - - We can now tell url() to create clean or dirty URLs regardless of current
  *     status!
+ * - - (lol jk no more url() - but maybe the equivalent code is still there)
  * - - Our path parsing code needs to account for both new and old dirty URL
  *     styles
  * - - Option to force output of clean or dirty URLs?
  * - Move _pathologic_filter() code into the actual filter class 
  * - Do DOM object manipulation instead of preg_replace(). It's what core
  *   filters are doing now.
+ * - UrlHelper::Parse() instead of parse_url()?
+ * - Alter hook alters Drupal\Core\Url object instead of method parameters.
  */
 use Drupal\Component\Utility\String;
 use Drupal\Component\Utility\Unicode;
+use Drupal\Core\Url;
 
 /**
  * Pathologic filter callback.
@@ -339,28 +343,8 @@ function _pathologic_replace($matches) {
     return $matches[0];
   }
 
-  // If the path is for a file and clean URLs are disabled, then the path that
-  // url() will create will have a q= query fragment, which won't work for
-  // files. To avoid that, we use this trick to temporarily turn clean URLs on.
-  // This is horrible, but it seems to be the sanest way to do this.
-  // @see http://drupal.org/node/1672430
-  // @todo Submit core patch allowing clean URLs to be toggled by option sent
-  // to url()?
-  if (!empty($cached_settings['is_file'])) {
-    $cached_settings['orig_clean_url'] = !empty($GLOBALS['conf']['clean_url']);
-    if (!$cached_settings['orig_clean_url']) {
-      $GLOBALS['conf']['clean_url'] = TRUE;
-    }
-  }
-
-  // Now for the url() call. Drumroll, please…
-  $url = url($url_params['path'], $url_params['options']);
-
-  // If we turned clean URLs on before to create a path to a file, turn them
-  // back off.
-  if ($cached_settings['is_file'] && !$cached_settings['orig_clean_url']) {
-    $GLOBALS['conf']['clean_url'] = FALSE;
-  }
+  // Now to build the URL. Drumroll, please…
+  $url = Url::fromUri('base://' . $url_params['path'], $url_params['options'])->toString();
 
   // If we need to create a protocol-relative URL, then convert the absolute
   // URL we have now.

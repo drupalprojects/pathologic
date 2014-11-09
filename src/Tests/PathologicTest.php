@@ -11,6 +11,7 @@ use Drupal\Component\Utility\String;
 use Drupal\simpletest\WebTestBase;
 use Drupal\pathologic\Plugin\Filter\FilterPathologic;
 use Drupal\Core\Language\Language;
+use Drupal\Core\Url;
 
 /**
  * Tests Pathologic functionality.
@@ -191,8 +192,8 @@ class PathologicTest extends WebTestBase {
       t('Path Filter compatibility (internal:)')
     );
     $this->assertEqual(
-      $filter->process('<a href="files:image.jpeg">', Language::LANGCODE_NOT_SPECIFIED, NULL, NULL),
-      '<a href="' . _pathologic_content_url(file_create_url('public://image.jpeg'), array('absolute' => TRUE, 'is_file' => TRUE)) . '">',
+      $filter->process('<a href="files:image.jpeg">look</a>', Language::LANGCODE_NOT_SPECIFIED, NULL, NULL),
+      '<a href="' . _pathologic_content_url(file_create_url(file_default_scheme() . '://image.jpeg'), array('absolute' => TRUE)) . '">look</a>',
       t('Path Filter compatibility (files:)')
     );
     $this->assertEqual(
@@ -249,5 +250,9 @@ function _pathologic_content_url($path, $options) {
     $options['script_path'] = '';
   }
 
-  return String::checkPlain(url(htmlspecialchars_decode($path), $options));
+  if (parse_url($path, PHP_URL_SCHEME) === NULL) {
+    $path = 'base://' . $path;
+  }
+
+  return String::checkPlain(Url::fromUri(htmlspecialchars_decode($path), $options)->toString());
 }

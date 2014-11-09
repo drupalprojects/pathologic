@@ -20,6 +20,7 @@
  *   filters are doing now.
  */
 use Drupal\Component\Utility\String;
+use Drupal\Component\Utility\Unicode;
 
 /**
  * Pathologic filter callback.
@@ -213,7 +214,7 @@ function _pathologic_replace($matches) {
       // http://foo/bar/baz; or the "Also local" was something like /bar and
       // this URL is something like /bar/baz. And we only care about the /baz
       // part.
-      $parts['path'] = drupal_substr($parts['path'], drupal_strlen($exploded['path']));
+      $parts['path'] = Unicode::substr($parts['path'], Unicode::strlen($exploded['path']));
       $found = TRUE;
       // Break out of the foreach loop
       break;

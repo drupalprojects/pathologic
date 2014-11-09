@@ -294,14 +294,23 @@ function _pathologic_replace($matches) {
 
   // Okay, deal with language stuff.
   // Let's see if we can split off a language prefix from the path.
-  if (\Drupal::moduleHandler()->moduleExists('locale')) {
-    // Sometimes this file will be require_once-d by the locale module before
-    // this point, and sometimes not. We require_once it ourselves to be sure.
-    require_once DRUPAL_ROOT . '/core/includes/language.inc';
-    list($language_obj, $path) = language_url_split_prefix($parts['path'], language_list());
-    if ($language_obj) {
-      $parts['path'] = $path;
-      $parts['language_obj'] = $language_obj;
+  if (\Drupal::moduleHandler()->moduleExists('language')) {
+    // This logic is based on
+    // \Drupal\language\Plugin\LanguageNegotiation\LanguageNegotiationUrl::getLangcode().
+    $languages = \Drupal::languageManager()->getLanguages();
+    $config = \Drupal::config('language.negotiation')->get('url');
+
+    $request_path = urldecode(trim($parts['path'], '/'));
+    $path_args = explode('/', $request_path);
+    $prefix = array_shift($path_args);
+
+    // Search for prefix within added languages.
+    foreach ($languages as $language) {
+      if (isset($config['prefixes'][$language->getId()]) && $config['prefixes'][$language->getId()] == $prefix) {
+        $parts['path'] = implode('/', $path_args);
+        $parts['language_obj'] = $language;
+        break;
+      }
     }
   }
 

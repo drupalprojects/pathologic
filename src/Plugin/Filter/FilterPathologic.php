@@ -11,9 +11,16 @@ use Drupal\filter\FilterProcessResult;
 use Drupal\filter\Plugin\FilterBase;
 use Drupal\Component\Utility\Crypt;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\pathologic\PathologicSettingsCommon;
+use Drupal\Core\Url;
 
 /**
  * Attempts to correct broken paths in content.
+ *
+ * We give the filter a weight of 50 in the annotation below because in almost
+ * all cases Pathologic should be the last filter in the filter list. Is it
+ * possible to put a comment inside an annotation? Man, annotations are such a
+ * stupid idea.
  *
  * @Filter(
  *   id = "filter_pathologic",
@@ -21,7 +28,8 @@ use Drupal\Core\Form\FormStateInterface;
  *   type = Drupal\filter\Plugin\FilterInterface::TYPE_TRANSFORM_IRREVERSIBLE,
  *   settings = {
  *     "local_paths" = "",
- *     "protocol_style" = "full"
+ *     "protocol_style" = "full",
+ *     "source" = "global"
  *   },
  *   weight = 50
  * )
@@ -34,28 +42,56 @@ class FilterPathologic extends FilterBase {
   public function settingsForm(array $form, FormStateInterface $form_state) {
     $form['reminder'] = array(
       '#type' => 'item',
-      '#title' => t('In most cases, Pathologic should be the <em>last</em> filter in the &ldquo;Filter processing order&rdquo; list.'),
+      '#title' => $this->t('In most cases, Pathologic should be the <em>last</em> filter in the &ldquo;Filter processing order&rdquo; list.'),
       '#weight' => 0,
     );
-    $form['protocol_style'] = array(
+    $form['settings_source'] = array(
       '#type' => 'radios',
-      '#title' => t('Processed URL format'),
-      '#default_value' => $this->settings['protocol_style'],
-      '#options' => array(
-        'full' => t('Full URL (<code>http://example.com/foo/bar</code>)'),
-        'proto-rel' => t('Protocol relative URL (<code>//example.com/foo/bar</code>)'),
-        'path' => t('Path relative to server root (<code>/foo/bar</code>)'),
-      ),
-      '#description' => t('The <em>Full URL</em> option is best for stopping broken images and links in syndicated content (such as in RSS feeds), but will likely lead to problems if your site is accessible by both HTTP and HTTPS. Paths output with the <em>Protocol relative URL</em> option will avoid such problems, but feed readers and other software not using up-to-date standards may be confused by the paths. The <em>Path relative to server root</em> option will avoid problems with sites accessible by both HTTP and HTTPS with no compatibility concerns, but will absolutely not fix broken images and links in syndicated content.'),
+      '#title' => $this->t('Settings source'),
+      '#description' => $this->t('Select whether Pathologic should use the <a href="!config">global Pathologic settings</a> or custom &ldquo;local&rdquo; settings when filtering text in this text format.', array('!config' => Url::fromRoute('pathologic.config_form'))),
       '#weight' => 10,
+      '#default_value' => $this->settings['source'],
+      '#options' => array(
+        'global' => $this->t('Use global Pathologic settings'),
+        'local' => $this->t('Use custom settings for this text format'),
+      ),
     );
-    $form['local_paths'] = array(
-      '#type' => 'textarea',
-      '#title' =>  t('All base paths for this site'),
-      '#default_value' => $this->settings['local_paths'],
-        '#description' => t('If this site is or was available at more than one base path or URL, enter them here, separated by line breaks. For example, if this site is live at <code>http://example.com/</code> but has a staging version at <code>http://dev.example.org/staging/</code>, you would enter both those URLs here. If confused, please read <a href="!docs">Pathologic&rsquo;s documentation</a> for more information about this option and what it affects.', array('!docs' => 'http://drupal.org/node/257026')),
+    // Whoops - fields in fieldsets on filter forms are broken.
+    // @see https://www.drupal.org/node/2378437
+/*
+    $form['local_settings'] = array(
+      '#type' => 'fieldset',
+      '#title' => $this->t('Custom settings for this input format'),
       '#weight' => 20,
+      '#collapsible' => FALSE,
+      '#collapsed' => FALSE,
+      '#description' => $this->t('These settings are ignored if &ldquo;Use global Pathologic settings&rdquo; is selected above.'),
+      // @todo Fix the #states magic (or see if it's a core D8 bug)
+      '#states' => array(
+        'visible' => array(
+          ':input[name="filters[pathologic][settings][settings_source]"]' => array('value' => 'local'),
+        ),
+      ),
     );
+
+    $common = new PathologicSettingsCommon();
+    $form['local_settings'] += $common->commonSettingsForm($this->settings);
+*/
+
+    // Workaround:
+    $form['local_settings'] = array(
+      '#type' => 'item',
+      '#title' => $this->t('Custom settings for this input format'),
+      '#weight' => 20,
+      '#markup' => $this->t('These settings are ignored if &ldquo;Use global Pathologic settings&rdquo; is selected above.'),
+    );
+    $common = new PathologicSettingsCommon();
+    $common_fields = $common->commonSettingsForm($this->settings);
+    foreach ($common_fields as &$widget) {
+      $widget['#weight'] += 100;
+    }
+    $form += $common_fields;
+
     return $form;
   }
 
@@ -63,8 +99,14 @@ class FilterPathologic extends FilterBase {
    * {@inheritdoc}
    */
   public function process($text, $langcode) {
+    $settings = $this->settings;
+    if ($settings['settings_source'] === 'global') {
+      $config = \Drupal::config('pathologic.settings');
+      $settings['protocol_style'] = $config->get('global.protocol_style');
+      $settings['local_paths'] = $config->get('global.local_paths');
+    }
     // @todo Move code from .module file to inside here.
-    return new FilterProcessResult(_pathologic_filter($text, $this->settings, Crypt::hashBase64(serialize($this->settings))));
+    return new FilterProcessResult(_pathologic_filter($text, $settings, Crypt::hashBase64(serialize($settings))));
   }
 
 }

@@ -37,9 +37,6 @@ class PathologicTest extends WebTestBase {
       t('Protocol-relative URL creation with https:// URL')
     );
 
-    // Build a phony filter
-    $filter = new FilterPathologic(array('settings' => array('protocol_style' => 'full', 'local_paths' => '')), 'foo', array('provider' => 'pathologic', 'cache' => FALSE));
-
     // Build some paths to check against
     $test_paths = array(
       'foo' => array(
@@ -81,139 +78,135 @@ class PathologicTest extends WebTestBase {
       ),
     );
 
-    // Run tests with clean URLs both enabled and disabled
-    foreach (array('', 'index.php/') as $script_path_option) {
-      $script_path = $script_path_option;
-      // Run tests with absoulte filtering enabled and disabled
-      foreach (array('full', 'proto-rel', 'path') as $protocol_style) {
-        $filter->settings['protocol_style'] = $protocol_style;
-        $paths = array();
-        foreach ($test_paths as $path => $args) {
-          $args['opts']['absolute'] = $protocol_style !== 'path';
-          $paths[$path] = _pathologic_content_url($args['path'], $args['opts']);
-          if ($protocol_style === 'proto-rel') {
-            $paths[$path] = _pathologic_url_to_protocol_relative($paths[$path]);
-          }
+    foreach (array('full', 'proto-rel', 'path') as $protocol_style) {
+      $format_id = _pathologic_build_format(array('protocol_style' => $protocol_style, 'settings_source' => 'local'));
+      $paths = array();
+      foreach ($test_paths as $path => $args) {
+        $args['opts']['absolute'] = $protocol_style !== 'path';
+        $paths[$path] = _pathologic_content_url($args['path'], $args['opts']);
+        if ($protocol_style === 'proto-rel') {
+          $paths[$path] = _pathologic_url_to_protocol_relative($paths[$path]);
         }
-        $t10ns = array(
-          '!clean' => empty($script_path) ? t('Yes') : t('No'),
-          '!ps' => $protocol_style,
-        );
-
-        $this->assertEqual(
-          $filter->process('<a href="foo"><img src="foo/bar" /></a>', Language::LANGCODE_NOT_SPECIFIED, NULL, NULL),
-          '<a href="' . $paths['foo'] . '"><img src="' . $paths['foo/bar'] . '" /></a>',
-          t('Simple paths. Clean URLs: !clean; protocol style: !ps.', $t10ns)
-        );
-        $this->assertEqual(
-          $filter->process('<a href="index.php?q=foo"></a><a href="index.php?q=foo/bar&baz=qux"></a>', Language::LANGCODE_NOT_SPECIFIED, NULL, NULL),
-          '<a href="' . $paths['foo'] . '"></a><a href="' . $paths['foo/bar?baz=qux'] . '"></a>',
-          t('D7 and earlier-style non-clean URLs. Clean URLs: !clean; protocol style: !ps.', $t10ns)
-        );
-        $this->assertEqual(
-          $filter->process('<a href="index.php/foo"></a><a href="index.php/foo/bar?baz=qux"></a>', Language::LANGCODE_NOT_SPECIFIED, NULL, NULL),
-          '<a href="' . $paths['foo'] . '"></a><a href="' . $paths['foo/bar?baz=qux'] . '"></a>',
-          t('D8-style non-clean URLs. Clean URLs: !clean; protocol style: !ps.', $t10ns)
-        );
-        $this->assertEqual(
-          $filter->process('<form action="foo/bar?baz"><IMG LONGDESC="foo/bar?baz=qux" /></a>', Language::LANGCODE_NOT_SPECIFIED, NULL, NULL),
-          '<form action="' . $paths['foo/bar?baz'] . '"><IMG LONGDESC="' . $paths['foo/bar?baz=qux'] . '" /></a>',
-          t('Paths with query string. Clean URLs: !clean; protocol style: !ps.', $t10ns)
-        );
-        $this->assertEqual(
-          $filter->process('<a href="foo/bar#baz">', Language::LANGCODE_NOT_SPECIFIED, NULL, NULL),
-          '<a href="' . $paths['foo/bar#baz'] . '">',
-          t('Path with fragment. Clean URLs: !clean; protocol style: !ps.', $t10ns)
-        );
-        $this->assertEqual(
-          $filter->process('<a href="#foo">', Language::LANGCODE_NOT_SPECIFIED, NULL, NULL),
-          '<a href="#foo">',
-          t('Fragment-only href. Clean URLs: !clean; protocol style: !ps.', $t10ns)
-        );
-        // @see https://drupal.org/node/2208223
-        $this->assertEqual(
-          $filter->process('<a href="#">', Language::LANGCODE_NOT_SPECIFIED, NULL, NULL),
-          '<a href="#">',
-          t('Hash-only href. Clean URLs: !clean; protocol style: !ps.', $t10ns)
-        );
-        $this->assertEqual(
-          $filter->process('<a href="foo/bar?baz=qux&amp;quux=quuux#quuuux">', Language::LANGCODE_NOT_SPECIFIED, NULL, NULL),
-          '<a href="' . $paths['foo/bar?baz=qux&amp;quux=quuux#quuuux'] . '">',
-          t('Path with query string and fragment. Clean URLs: !clean; protocol style: !ps.', $t10ns)
-        );
-        $this->assertEqual(
-          $filter->process('<a href="foo%20bar?baz=qux%26quux">', Language::LANGCODE_NOT_SPECIFIED, NULL, NULL),
-          '<a href="' . $paths['foo%20bar?baz=qux%26quux'] . '">',
-          t('Path with URL encoded parts. Clean URLs: !clean; protocol style: !ps.', $t10ns)
-        );
-        $this->assertEqual(
-          $filter->process('<a href="/"></a>', Language::LANGCODE_NOT_SPECIFIED, NULL, NULL),
-          '<a href="' . $paths['/'] . '"></a>',
-          t('Path with just slash. Clean URLs: !clean; protocol style: !ps', $t10ns)
-        );
       }
+      $t10ns = array(
+        '!clean' => empty($script_path) ? t('Yes') : t('No'),
+        '!ps' => $protocol_style,
+      );
+
+      $this->assertEqual(
+        check_markup('<a href="foo"><img src="foo/bar" /></a>', $format_id),
+        '<a href="' . $paths['foo'] . '"><img src="' . $paths['foo/bar'] . '" /></a>',
+        t('Simple paths. Clean URLs: !clean; protocol style: !ps.', $t10ns)
+      );
+      $this->assertEqual(
+        check_markup('<a href="index.php?q=foo"></a><a href="index.php?q=foo/bar&baz=qux"></a>', $format_id),
+        '<a href="' . $paths['foo'] . '"></a><a href="' . $paths['foo/bar?baz=qux'] . '"></a>',
+        t('D7 and earlier-style non-clean URLs. Clean URLs: !clean; protocol style: !ps.', $t10ns)
+      );
+      $this->assertEqual(
+        check_markup('<a href="index.php/foo"></a><a href="index.php/foo/bar?baz=qux"></a>', $format_id),
+        '<a href="' . $paths['foo'] . '"></a><a href="' . $paths['foo/bar?baz=qux'] . '"></a>',
+        t('D8-style non-clean URLs. Clean URLs: !clean; protocol style: !ps.', $t10ns)
+      );
+      $this->assertEqual(
+        check_markup('<form action="foo/bar?baz"><IMG LONGDESC="foo/bar?baz=qux" /></a>', $format_id),
+        '<form action="' . $paths['foo/bar?baz'] . '"><IMG LONGDESC="' . $paths['foo/bar?baz=qux'] . '" /></a>',
+        t('Paths with query string. Clean URLs: !clean; protocol style: !ps.', $t10ns)
+      );
+      $this->assertEqual(
+        check_markup('<a href="foo/bar#baz">', $format_id),
+        '<a href="' . $paths['foo/bar#baz'] . '">',
+        t('Path with fragment. Clean URLs: !clean; protocol style: !ps.', $t10ns)
+      );
+      $this->assertEqual(
+        check_markup('<a href="#foo">', $format_id),
+        '<a href="#foo">',
+        t('Fragment-only href. Clean URLs: !clean; protocol style: !ps.', $t10ns)
+      );
+      // @see https://drupal.org/node/2208223
+      $this->assertEqual(
+        check_markup('<a href="#">', $format_id),
+        '<a href="#">',
+        t('Hash-only href. Clean URLs: !clean; protocol style: !ps.', $t10ns)
+      );
+      $this->assertEqual(
+        check_markup('<a href="foo/bar?baz=qux&amp;quux=quuux#quuuux">', $format_id),
+        '<a href="' . $paths['foo/bar?baz=qux&amp;quux=quuux#quuuux'] . '">',
+        t('Path with query string and fragment. Clean URLs: !clean; protocol style: !ps.', $t10ns)
+      );
+      $this->assertEqual(
+        check_markup('<a href="foo%20bar?baz=qux%26quux">', $format_id),
+        '<a href="' . $paths['foo%20bar?baz=qux%26quux'] . '">',
+        t('Path with URL encoded parts. Clean URLs: !clean; protocol style: !ps.', $t10ns)
+      );
+      $this->assertEqual(
+        check_markup('<a href="/"></a>', $format_id),
+        '<a href="' . $paths['/'] . '"></a>',
+        t('Path with just slash. Clean URLs: !clean; protocol style: !ps', $t10ns)
+      );
     }
 
     global $base_path;
     $this->assertEqual(
-      $filter->process('<a href="' . $base_path . 'foo">bar</a>', Language::LANGCODE_NOT_SPECIFIED, NULL, NULL),
+      check_markup('<a href="' . $base_path . 'foo">bar</a>', $format_id),
       '<a href="' . _pathologic_content_url('foo', array('absolute' => FALSE)) .'">bar</a>',
       t('Paths beginning with $base_path (like WYSIWYG editors like to make)')
     );
     global $base_url;
     $this->assertEqual(
-      $filter->process('<a href="' . $base_url . '/foo">bar</a>', Language::LANGCODE_NOT_SPECIFIED, NULL, NULL),
+      check_markup('<a href="' . $base_url . '/foo">bar</a>', $format_id),
       '<a href="' . _pathologic_content_url('foo', array('absolute' => FALSE)) .'">bar</a>',
       t('Paths beginning with $base_url')
     );
 
     // @see http://drupal.org/node/1617944
     $this->assertEqual(
-      $filter->process('<a href="//example.com/foo">bar</a>', Language::LANGCODE_NOT_SPECIFIED, NULL, NULL),
+      check_markup('<a href="//example.com/foo">bar</a>', $format_id),
       '<a href="//example.com/foo">bar</a>',
       t('Off-site schemeless URLs (//example.com/foo) ignored')
     );
 
     // Test internal: and all base paths
-    $filter->settings = array(
+    $format_id = _pathologic_build_format(array(
       'protocol_style' => 'full',
       'local_paths' => "http://example.com/qux\nhttp://example.org\n/bananas",
-    );
+      'settings_source' => 'local',
+    ));
 
     // @see https://drupal.org/node/2030789
     $this->assertEqual(
-      $filter->process('<a href="//example.org/foo">bar</a>', Language::LANGCODE_NOT_SPECIFIED, NULL, NULL),
+      check_markup('<a href="//example.org/foo">bar</a>', $format_id),
       '<a href="' . _pathologic_content_url('foo', array('absolute' => TRUE)) . '">bar</a>',
       t('On-site schemeless URLs processed')
     );
     $this->assertEqual(
-      $filter->process('<a href="internal:foo">', Language::LANGCODE_NOT_SPECIFIED, NULL, NULL),
+      check_markup('<a href="internal:foo">', $format_id),
       '<a href="' . _pathologic_content_url('foo', array('absolute' => TRUE)) . '">',
       t('Path Filter compatibility (internal:)')
     );
     $this->assertEqual(
-      $filter->process('<a href="files:image.jpeg">look</a>', Language::LANGCODE_NOT_SPECIFIED, NULL, NULL),
+      check_markup('<a href="files:image.jpeg">look</a>', $format_id),
       '<a href="' . _pathologic_content_url(file_create_url(file_default_scheme() . '://image.jpeg'), array('absolute' => TRUE)) . '">look</a>',
       t('Path Filter compatibility (files:)')
     );
     $this->assertEqual(
-      $filter->process('<a href="http://example.com/qux/foo"><img src="http://example.org/bar.jpeg" longdesc="/bananas/baz" /></a>', Language::LANGCODE_NOT_SPECIFIED, NULL, NULL),
+      check_markup('<a href="http://example.com/qux/foo"><img src="http://example.org/bar.jpeg" longdesc="/bananas/baz" /></a>', $format_id),
       '<a href="' . _pathologic_content_url('foo', array('absolute' => TRUE)) . '"><img src="' . _pathologic_content_url('bar.jpeg', array('absolute' => TRUE)) . '" longdesc="' . _pathologic_content_url('baz', array('absolute' => TRUE)) . '" /></a>',
       t('"All base paths for this site" functionality')
     );
     $this->assertEqual(
-      $filter->process('<a href="webcal:foo">bar</a>', Language::LANGCODE_NOT_SPECIFIED, NULL, NULL),
+      check_markup('<a href="webcal:foo">bar</a>', $format_id),
       '<a href="webcal:foo">bar</a>',
       t('URLs with likely protocols are ignored')
     );
     // Test hook_pathologic_alter() implementation.
     $this->assertEqual(
-      $filter->process('<a href="foo?test=add_foo_qpart">', Language::LANGCODE_NOT_SPECIFIED, NULL, NULL),
+      check_markup('<a href="foo?test=add_foo_qpart">', $format_id),
       '<a href="' . _pathologic_content_url('foo', array('absolute' => TRUE, 'query' => array('test' => 'add_foo_qpart', 'foo' => 'bar'))) . '">',
       t('hook_pathologic_alter(): Alter $url_params')
     );
     $this->assertEqual(
-      $filter->process('<a href="bar?test=use_original">', Language::LANGCODE_NOT_SPECIFIED, NULL, NULL),
+      check_markup('<a href="bar?test=use_original">', $format_id),
       '<a href="bar?test=use_original">',
       t('hook_pathologic_alter(): Passthrough with use_original option')
     );
@@ -221,10 +214,24 @@ class PathologicTest extends WebTestBase {
     // Test paths to existing files when clean URLs are disabled.
     // @see http://drupal.org/node/1672430
     $script_path = '';
-    $filtered_tag = $filter->process('<img src="misc/druplicon.png" />', Language::LANGCODE_NOT_SPECIFIED, NULL, NULL);
+    $filtered_tag = check_markup('<img src="misc/druplicon.png" />', $format_id);
     $this->assertTrue(
       strpos($filtered_tag, 'q=') === FALSE,
       t('Paths to files don\'t have ?q= when clean URLs are off')
+    );
+
+    $format_id = _pathologic_build_format(array(
+      'protocol_style' => 'rel',
+      'settings_source' => 'global',
+    ));
+    \Drupal::config('pathologic.settings')
+      ->set('global.protocol_style', 'proto-rel')
+      ->set('global.local_paths', 'http://example.com/')
+      ->save();
+    $this->assertEqual(
+      check_markup('<img src="http://example.com/foo.jpeg" />', $format_id),
+      '<img src="' . _pathologic_url_to_protocol_relative(_pathologic_content_url('foo.jpeg', array('absolute' => TRUE))) . '" />',
+      t('Use global settings when so configured on the format')
     );
   }
 }
@@ -253,6 +260,28 @@ function _pathologic_content_url($path, $options) {
   if (parse_url($path, PHP_URL_SCHEME) === NULL) {
     $path = 'base://' . $path;
   }
-
   return String::checkPlain(Url::fromUri(htmlspecialchars_decode($path), $options)->toString());
+}
+
+
+/**
+ * Build a text format with Pathologic configured a certain way.
+ *
+ * @param $settings
+ *   An array of settings for the Pathologic instance on the format.
+ * @return
+ *   A format machine name (consisting of random characters) for the format.
+ */
+function _pathologic_build_format($settings) {
+  $format_id = user_password();
+  $format = entity_create('filter_format', array(
+    'format' => $format_id,
+    'name' => $format_id,
+  ));
+  $format->setFilterConfig('filter_pathologic', array(
+    'status' => 1,
+    'settings' => $settings,
+  ));
+  $format->save();
+  return $format_id;
 }

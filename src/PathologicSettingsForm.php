@@ -53,4 +53,15 @@ class PathologicSettingsForm extends ConfigFormBase {
 
     parent::submitForm($form, $form_state);
   }
+
+  /**
+   * @inheritdoc
+   */
+  protected function getEditableConfigNames() {
+    return [
+      'pathologic.settings.protocol_style',
+      'pathologic.settings.local_paths',
+    ];
+  }
+
 }

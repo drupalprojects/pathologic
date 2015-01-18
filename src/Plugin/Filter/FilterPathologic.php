@@ -27,9 +27,11 @@ use Drupal\Core\Url;
  *   title = @Translation("Correct URLs with Pathologic"),
  *   type = Drupal\filter\Plugin\FilterInterface::TYPE_TRANSFORM_IRREVERSIBLE,
  *   settings = {
- *     "local_paths" = "",
- *     "protocol_style" = "full",
- *     "source" = "global"
+ *     "settings_source" = "global",
+ *     "local_settings" = {
+ *       "protocol_style" = "full",
+ *       "local_paths" = ""
+ *     }
  *   },
  *   weight = 50
  * )
@@ -50,15 +52,14 @@ class FilterPathologic extends FilterBase {
       '#title' => $this->t('Settings source'),
       '#description' => $this->t('Select whether Pathologic should use the <a href="!config">global Pathologic settings</a> or custom &ldquo;local&rdquo; settings when filtering text in this text format.', array('!config' => Url::fromRoute('pathologic.config_form'))),
       '#weight' => 10,
-      '#default_value' => $this->settings['source'],
+      '#default_value' => $this->settings['settings_source'],
       '#options' => array(
         'global' => $this->t('Use global Pathologic settings'),
         'local' => $this->t('Use custom settings for this text format'),
       ),
     );
-    // Whoops - fields in fieldsets on filter forms are broken.
+    // Fields in fieldsets are… awkward to implement.
     // @see https://www.drupal.org/node/2378437
-/*
     $form['local_settings'] = array(
       '#type' => 'fieldset',
       '#title' => $this->t('Custom settings for this input format'),
@@ -75,22 +76,7 @@ class FilterPathologic extends FilterBase {
     );
 
     $common = new PathologicSettingsCommon();
-    $form['local_settings'] += $common->commonSettingsForm($this->settings);
-*/
-
-    // Workaround:
-    $form['local_settings'] = array(
-      '#type' => 'item',
-      '#title' => $this->t('Custom settings for this input format'),
-      '#weight' => 20,
-      '#markup' => $this->t('These settings are ignored if &ldquo;Use global Pathologic settings&rdquo; is selected above.'),
-    );
-    $common = new PathologicSettingsCommon();
-    $common_fields = $common->commonSettingsForm($this->settings);
-    foreach ($common_fields as &$widget) {
-      $widget['#weight'] += 100;
-    }
-    $form += $common_fields;
+    $form['local_settings'] += $common->commonSettingsForm($this->settings['local_settings']);
 
     return $form;
   }

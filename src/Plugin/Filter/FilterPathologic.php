@@ -88,8 +88,8 @@ class FilterPathologic extends FilterBase {
     $settings = $this->settings;
     if ($settings['settings_source'] === 'global') {
       $config = \Drupal::config('pathologic.settings');
-      $settings['protocol_style'] = $config->get('global.protocol_style');
-      $settings['local_paths'] = $config->get('global.local_paths');
+      $settings['protocol_style'] = $config->get('protocol_style');
+      $settings['local_paths'] = $config->get('local_paths');
     }
     else {
       $settings = $settings['local_settings'];

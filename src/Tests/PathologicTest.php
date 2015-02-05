@@ -79,7 +79,7 @@ class PathologicTest extends WebTestBase {
     );
 
     foreach (array('full', 'proto-rel', 'path') as $protocol_style) {
-      $format_id = _pathologic_build_format(array('protocol_style' => $protocol_style, 'settings_source' => 'local'));
+      $format_id = _pathologic_build_format(['settings_source' => 'local', 'local_settings' => ['protocol_style' => $protocol_style]]);
       $paths = array();
       foreach ($test_paths as $path => $args) {
         $args['opts']['absolute'] = $protocol_style !== 'path';
@@ -167,11 +167,13 @@ class PathologicTest extends WebTestBase {
     );
 
     // Test internal: and all base paths
-    $format_id = _pathologic_build_format(array(
-      'protocol_style' => 'full',
-      'local_paths' => "http://example.com/qux\nhttp://example.org\n/bananas",
+    $format_id = _pathologic_build_format([
       'settings_source' => 'local',
-    ));
+      'local_settings' => [
+        'local_paths' => "http://example.com/qux\nhttp://example.org\n/bananas",
+        'protocol_style' => 'full',
+      ],
+    ]);
 
     // @see https://drupal.org/node/2030789
     $this->assertEqual(
@@ -220,13 +222,15 @@ class PathologicTest extends WebTestBase {
       t('Paths to files don\'t have ?q= when clean URLs are off')
     );
 
-    $format_id = _pathologic_build_format(array(
-      'protocol_style' => 'rel',
+    $format_id = _pathologic_build_format([
       'settings_source' => 'global',
-    ));
-    \Drupal::config('pathologic.settings')
-      ->set('global.protocol_style', 'proto-rel')
-      ->set('global.local_paths', 'http://example.com/')
+      'local_settings' => [
+        'protocol_style' => 'rel',
+      ],
+    ]);
+    $this->config('pathologic.settings')
+      ->set('protocol_style', 'proto-rel')
+      ->set('local_paths', 'http://example.com/')
       ->save();
     $this->assertEqual(
       check_markup('<img src="http://example.com/foo.jpeg" />', $format_id),
@@ -274,14 +278,14 @@ function _pathologic_content_url($path, $options) {
  */
 function _pathologic_build_format($settings) {
   $format_id = user_password();
-  $format = entity_create('filter_format', array(
+  $format = entity_create('filter_format', [
     'format' => $format_id,
     'name' => $format_id,
-  ));
-  $format->setFilterConfig('filter_pathologic', array(
+  ]);
+  $format->setFilterConfig('filter_pathologic', [
     'status' => 1,
     'settings' => $settings,
-  ));
+  ]);
   $format->save();
   return $format_id;
 }

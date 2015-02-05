@@ -91,6 +91,9 @@ class FilterPathologic extends FilterBase {
       $settings['protocol_style'] = $config->get('global.protocol_style');
       $settings['local_paths'] = $config->get('global.local_paths');
     }
+    else {
+      $settings = $settings['local_settings'];
+    }
     // @todo Move code from .module file to inside here.
     return new FilterProcessResult(_pathologic_filter($text, $settings, Crypt::hashBase64(serialize($settings))));
   }

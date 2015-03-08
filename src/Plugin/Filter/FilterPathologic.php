@@ -50,7 +50,7 @@ class FilterPathologic extends FilterBase {
     $form['settings_source'] = array(
       '#type' => 'radios',
       '#title' => $this->t('Settings source'),
-      '#description' => $this->t('Select whether Pathologic should use the <a href="!config">global Pathologic settings</a> or custom &ldquo;local&rdquo; settings when filtering text in this text format.', array('!config' => Url::fromRoute('pathologic.config_form'))),
+      '#description' => $this->t('Select whether Pathologic should use the <a href="!config">global Pathologic settings</a> or custom &ldquo;local&rdquo; settings when filtering text in this text format.', array('!config' => Url::fromRoute('pathologic.config_form')->toString())),
       '#weight' => 10,
       '#default_value' => $this->settings['settings_source'],
       '#options' => array(

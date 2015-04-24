@@ -130,18 +130,19 @@ function _pathologic_filter($text, $filter, $format, $langcode, $cache, $cache_i
   // different settings, we build an array of settings, keyed by format ID.
   $cached_settings = &drupal_static(__FUNCTION__, array());
   if (!isset($cached_settings[$filter->format])) {
+    $filter_settings = $filter->settings;
     // Overwrite local settings with the global defaults if necessary
     if (_pathologic_get_real_settings_source($filter->format) === 'global') {
-      $filter->settings['protocol_style'] = variable_get('pathologic_protocol_style', 'full');
-      $filter->settings['local_paths'] = variable_get('pathologic_local_paths', '');
+      $filter_settings['protocol_style'] = variable_get('pathologic_protocol_style', 'full');
+      $filter_settings['local_paths'] = variable_get('pathologic_local_paths', '');
     }
-    $filter->settings['local_paths_exploded'] = array();
-    if ($filter->settings['local_paths'] !== '') {
+    $filter_settings['local_paths_exploded'] = array();
+    if ($filter_settings['local_paths'] !== '') {
       // Build an array of the exploded local paths for this format's settings.
       // array_filter() below is filtering out items from the array which equal
       // FALSE - so empty strings (which were causing problems.
       // @see http://drupal.org/node/1727492
-      $local_paths = array_filter(array_map('trim', explode("\n", $filter->settings['local_paths'])));
+      $local_paths = array_filter(array_map('trim', explode("\n", $filter_settings['local_paths'])));
       foreach ($local_paths as $local) {
         $parts = @parse_url($local);
         // Okay, what the hellish "if" statement is doing below is checking to
@@ -180,17 +181,17 @@ function _pathologic_filter($text, $filter, $format, $langcode, $cache, $cache_i
           )
         ) {
           // Add it to the list.
-          $filter->settings['local_paths_exploded'][] = $parts;
+          $filter_settings['local_paths_exploded'][] = $parts;
         }
       }
     }
     // Now add local paths based on "this" server URL.
-    $filter->settings['local_paths_exploded'][] = array('path' => $base_url_parts['path']);
-    $filter->settings['local_paths_exploded'][] = array('path' => $base_url_parts['path'], 'host' => $base_url_parts['host']);
+    $filter_settings['local_paths_exploded'][] = array('path' => $base_url_parts['path']);
+    $filter_settings['local_paths_exploded'][] = array('path' => $base_url_parts['path'], 'host' => $base_url_parts['host']);
     // We'll also just store the host part separately for easy access.
-    $filter->settings['base_url_host'] = $base_url_parts['host'];
+    $filter_settings['base_url_host'] = $base_url_parts['host'];
 
-    $cached_settings[$filter->format] = $filter->settings;
+    $cached_settings[$filter->format] = $filter_settings;
   }
   // Get the language code for the text we're about to process.
   $cached_settings['langcode'] = $langcode;

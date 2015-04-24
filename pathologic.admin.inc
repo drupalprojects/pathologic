@@ -24,7 +24,7 @@ function pathologic_configuration_form($form, $form_state) {
 }
 
 /**
- * Common elements for the Drupal configuration form.
+ * Common elements for the Pathologic configuration form.
  *
  * This reduces redundancy in code for form elements that will appear on both
  * the global settings form and the per-format filter settings form.

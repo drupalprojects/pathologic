@@ -16,13 +16,14 @@
  * - - Our path parsing code needs to account for both new and old dirty URL
  *     styles
  * - - Option to force output of clean or dirty URLs?
- * - Move _pathologic_filter() code into the actual filter class 
+ * - Move _pathologic_filter() code into the actual filter class
  * - Do DOM object manipulation instead of preg_replace(). It's what core
  *   filters are doing now.
  * - UrlHelper::Parse() instead of parse_url()?
  * - Alter hook alters Drupal\Core\Url object instead of method parameters.
  */
-use Drupal\Component\Utility\String;
+
+use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Url;
 
@@ -371,7 +372,7 @@ function _pathologic_replace($matches) {
 
   // Apply HTML character encoding, as is required for HTML attributes.
   // @see http://drupal.org/node/1672932
-  $url = String::checkPlain($url);
+  $url = SafeMarkup::checkPlain($url);
   // $matches[1] will be the tag attribute; src, href, etc.
   return " {$matches[1]}=\"{$url}";
 }

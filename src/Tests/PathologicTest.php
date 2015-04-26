@@ -7,7 +7,7 @@
 
 namespace Drupal\pathologic\Tests;
 
-use Drupal\Component\Utility\String;
+use Drupal\Component\Utility\SafeMarkup;
 use Drupal\simpletest\WebTestBase;
 use Drupal\pathologic\Plugin\Filter\FilterPathologic;
 use Drupal\Core\Language\Language;
@@ -264,7 +264,7 @@ function _pathologic_content_url($path, $options) {
   if (parse_url($path, PHP_URL_SCHEME) === NULL) {
     $path = 'base://' . $path;
   }
-  return String::checkPlain(Url::fromUri(htmlspecialchars_decode($path), $options)->toString());
+  return SafeMarkup::checkPlain(Url::fromUri(htmlspecialchars_decode($path), $options)->toString());
 }
 
 

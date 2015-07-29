@@ -262,6 +262,9 @@ function _pathologic_content_url($path, $options) {
   }
 
   if (parse_url($path, PHP_URL_SCHEME) === NULL) {
+    if ($path == '<front>') {
+      return SafeMarkup::checkPlain(Url::fromRoute('<front>', [], $options)->toString());
+    }
     $path = 'base://' . $path;
   }
   return SafeMarkup::checkPlain(Url::fromUri(htmlspecialchars_decode($path), $options)->toString());

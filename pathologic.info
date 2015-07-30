@@ -4,4 +4,4 @@ package = "Input filters"
 dependencies[] = filter
 core = 7.x
 configure = admin/config/content/pathologic
-files[] = pathologic.test
+files[] = tests/pathologic.test

@@ -1,5 +1,5 @@
 pathologic.settings:
-  type: mapping
+  type: config_object
   mapping:
     scheme_whitelist:
       type: sequence

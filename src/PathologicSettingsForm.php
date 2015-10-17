@@ -32,8 +32,8 @@ class PathologicSettingsForm extends ConfigFormBase {
       '#weight' => 0,
     );
     $defaults = array(
-      'protocol_style' => $config->get('global.protocol_style'),
-      'local_paths' => $config->get('global.local_paths'),
+      'protocol_style' => $config->get('protocol_style'),
+      'local_paths' => $config->get('local_paths'),
     );
 
     $common = new PathologicSettingsCommon();
@@ -47,8 +47,8 @@ class PathologicSettingsForm extends ConfigFormBase {
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $this->config('pathologic.settings')
-      ->set('global.protocol_style', $form_state->getValue('protocol_style'))
-      ->set('global.local_paths', $form_state->getValue('local_paths'))
+      ->set('protocol_style', $form_state->getValue('protocol_style'))
+      ->set('local_paths', $form_state->getValue('local_paths'))
       ->save();
 
     parent::submitForm($form, $form_state);
@@ -59,8 +59,7 @@ class PathologicSettingsForm extends ConfigFormBase {
    */
   protected function getEditableConfigNames() {
     return [
-      'pathologic.settings.protocol_style',
-      'pathologic.settings.local_paths',
+      'pathologic.settings',
     ];
   }
 

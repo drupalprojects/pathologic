@@ -238,6 +238,26 @@ class PathologicTest extends WebTestBase {
       t('Use global settings when so configured on the format')
     );
   }
+
+  /**
+   * Test settings form.
+   */
+  public function testSettingsForm() {
+    $this->drupalLogin($this->drupalCreateUser(array('administer filters')));
+    $this->drupalGet('admin/config/content/pathologic');
+    $this->assertText('Pathologic configuration');
+
+    // Test submit form.
+    $this->assertNoFieldChecked('edit-protocol-style-proto-rel');
+    $edit = [
+      'protocol_style' => 'proto-rel',
+      'local_paths' => 'http://example.com/',
+    ];
+    $this->drupalPostForm(NULL, $edit, t('Save configuration'));
+    $this->assertText('The configuration options have been saved.');
+    $this->assertFieldChecked('edit-protocol-style-proto-rel');
+    $this->assertText('http://example.com/');
+  }
 }
 
 /**

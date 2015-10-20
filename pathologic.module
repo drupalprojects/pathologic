@@ -74,7 +74,7 @@ function _pathologic_settings($form, &$form_state, $filter, $format, $defaults, 
   );
   $our_form['local_settings'] = array(
     '#type' => 'fieldset',
-    '#title' => t('Custom settings for this input format'),
+    '#title' => t('Custom settings for this text format'),
     '#weight' => 20,
     '#collapsible' => FALSE,
     '#collapsed' => FALSE,

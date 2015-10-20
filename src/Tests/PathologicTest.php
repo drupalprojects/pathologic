@@ -257,6 +257,8 @@ class PathologicTest extends WebTestBase {
     $this->assertText('The configuration options have been saved.');
     $this->assertFieldChecked('edit-protocol-style-proto-rel');
     $this->assertText('http://example.com/');
+    $this->clickLink('Pathologic’s documentation');
+    $this->assertResponse(200);
   }
 }
 

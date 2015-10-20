@@ -46,7 +46,7 @@ class PathologicSettingsCommon {
         '#type' => 'textarea',
         '#title' =>  $this->t('All base paths for this site'),
         '#default_value' => $defaults['local_paths'],
-          '#description' => $this->t('If this site is or was available at more than one base path or URL, enter them here, separated by line breaks. For example, if this site is live at <code>http://example.com/</code> but has a staging version at <code>http://dev.example.org/staging/</code>, you would enter both those URLs here. If confused, please read <a href=":docs" target="_blank">Pathologic&rsquo;s documentation</a> for more information about this option and what it affects.', array(':docs' => 'http://drupal.org/node/257026')),
+          '#description' => $this->t('If this site is or was available at more than one base path or URL, enter them here, separated by line breaks. For example, if this site is live at <code>http://example.com/</code> but has a staging version at <code>http://dev.example.org/staging/</code>, you would enter both those URLs here. If confused, please read <a href=":docs" target="_blank">Pathologic&rsquo;s documentation</a> for more information about this option and what it affects.', array(':docs' => 'https://www.drupal.org/node/257026')),
         '#weight' => 20,
       ),
     );

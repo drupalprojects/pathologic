@@ -62,7 +62,7 @@ class FilterPathologic extends FilterBase {
     // @see https://www.drupal.org/node/2378437
     $form['local_settings'] = array(
       '#type' => 'fieldset',
-      '#title' => $this->t('Custom settings for this input format'),
+      '#title' => $this->t('Custom settings for this text format'),
       '#weight' => 20,
       '#collapsible' => FALSE,
       '#collapsed' => FALSE,
@@ -70,7 +70,7 @@ class FilterPathologic extends FilterBase {
       // @todo Fix the #states magic (or see if it's a core D8 bug)
       '#states' => array(
         'visible' => array(
-          ':input[name="filters[pathologic][settings][settings_source]"]' => array('value' => 'local'),
+          ':input[name="filters[filter_pathologic][settings][settings_source]"]' => array('value' => 'local'),
         ),
       ),
     );

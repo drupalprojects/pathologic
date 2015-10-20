@@ -58,7 +58,7 @@ class FilterPathologic extends FilterBase {
         'local' => $this->t('Use custom settings for this text format'),
       ),
     );
-    // Fields in fieldsets are… awkward to implement.
+    // Fields in fieldsets are… awkward to implement.
     // @see https://www.drupal.org/node/2378437
     $form['local_settings'] = array(
       '#type' => 'fieldset',

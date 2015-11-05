@@ -89,60 +89,60 @@ class PathologicTest extends WebTestBase {
         }
       }
       $t10ns = array(
-        '!clean' => empty($script_path) ? t('Yes') : t('No'),
-        '!ps' => $protocol_style,
+        '@clean' => empty($script_path) ? t('Yes') : t('No'),
+        '@ps' => $protocol_style,
       );
 
       $this->assertEqual(
         check_markup('<a href="foo"><img src="foo/bar" /></a>', $format_id),
         '<a href="' . $paths['foo'] . '"><img src="' . $paths['foo/bar'] . '" /></a>',
-        t('Simple paths. Clean URLs: !clean; protocol style: !ps.', $t10ns)
+        t('Simple paths. Clean URLs: @clean; protocol style: @ps.', $t10ns)
       );
       $this->assertEqual(
         check_markup('<a href="index.php?q=foo"></a><a href="index.php?q=foo/bar&baz=qux"></a>', $format_id),
         '<a href="' . $paths['foo'] . '"></a><a href="' . $paths['foo/bar?baz=qux'] . '"></a>',
-        t('D7 and earlier-style non-clean URLs. Clean URLs: !clean; protocol style: !ps.', $t10ns)
+        t('D7 and earlier-style non-clean URLs. Clean URLs: @clean; protocol style: @ps.', $t10ns)
       );
       $this->assertEqual(
         check_markup('<a href="index.php/foo"></a><a href="index.php/foo/bar?baz=qux"></a>', $format_id),
         '<a href="' . $paths['foo'] . '"></a><a href="' . $paths['foo/bar?baz=qux'] . '"></a>',
-        t('D8-style non-clean URLs. Clean URLs: !clean; protocol style: !ps.', $t10ns)
+        t('D8-style non-clean URLs. Clean URLs: @clean; protocol style: @ps.', $t10ns)
       );
       $this->assertEqual(
         check_markup('<form action="foo/bar?baz"><IMG LONGDESC="foo/bar?baz=qux" /></a>', $format_id),
         '<form action="' . $paths['foo/bar?baz'] . '"><IMG LONGDESC="' . $paths['foo/bar?baz=qux'] . '" /></a>',
-        t('Paths with query string. Clean URLs: !clean; protocol style: !ps.', $t10ns)
+        t('Paths with query string. Clean URLs: @clean; protocol style: @ps.', $t10ns)
       );
       $this->assertEqual(
         check_markup('<a href="foo/bar#baz">', $format_id),
         '<a href="' . $paths['foo/bar#baz'] . '">',
-        t('Path with fragment. Clean URLs: !clean; protocol style: !ps.', $t10ns)
+        t('Path with fragment. Clean URLs: @clean; protocol style: @ps.', $t10ns)
       );
       $this->assertEqual(
         check_markup('<a href="#foo">', $format_id),
         '<a href="#foo">',
-        t('Fragment-only href. Clean URLs: !clean; protocol style: !ps.', $t10ns)
+        t('Fragment-only href. Clean URLs: @clean; protocol style: @ps.', $t10ns)
       );
       // @see https://drupal.org/node/2208223
       $this->assertEqual(
         check_markup('<a href="#">', $format_id),
         '<a href="#">',
-        t('Hash-only href. Clean URLs: !clean; protocol style: !ps.', $t10ns)
+        t('Hash-only href. Clean URLs: @clean; protocol style: @ps.', $t10ns)
       );
       $this->assertEqual(
         check_markup('<a href="foo/bar?baz=qux&amp;quux=quuux#quuuux">', $format_id),
         '<a href="' . $paths['foo/bar?baz=qux&amp;quux=quuux#quuuux'] . '">',
-        t('Path with query string and fragment. Clean URLs: !clean; protocol style: !ps.', $t10ns)
+        t('Path with query string and fragment. Clean URLs: @clean; protocol style: @ps.', $t10ns)
       );
       $this->assertEqual(
         check_markup('<a href="foo%20bar?baz=qux%26quux">', $format_id),
         '<a href="' . $paths['foo%20bar?baz=qux%26quux'] . '">',
-        t('Path with URL encoded parts. Clean URLs: !clean; protocol style: !ps.', $t10ns)
+        t('Path with URL encoded parts. Clean URLs: @clean; protocol style: @ps.', $t10ns)
       );
       $this->assertEqual(
         check_markup('<a href="/"></a>', $format_id),
         '<a href="' . $paths['/'] . '"></a>',
-        t('Path with just slash. Clean URLs: !clean; protocol style: !ps', $t10ns)
+        t('Path with just slash. Clean URLs: @clean; protocol style: @ps', $t10ns)
       );
     }
 

@@ -43,8 +43,8 @@ class FilterPathologic extends FilterBase {
    */
   public function settingsForm(array $form, FormStateInterface $form_state) {
     $form['reminder'] = array(
-      '#type' => 'item',
-      '#title' => $this->t('In most cases, Pathologic should be the <em>last</em> filter in the &ldquo;Filter processing order&rdquo; list.'),
+      '#type' => 'markup',
+      '#markup' => $this->t('In most cases, Pathologic should be the <em>last</em> filter in the &ldquo;Filter processing order&rdquo; list.'),
       '#weight' => 0,
     );
     $form['settings_source'] = array(

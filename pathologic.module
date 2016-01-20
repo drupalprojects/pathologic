@@ -388,9 +388,6 @@ function _pathologic_replace($matches) {
     // (eg, /ja/misc/message-24-ok.png)
     $parts['language_obj'] = (object) array('language' => LANGUAGE_NONE, 'prefix' => '');
   }
-  else if(!empty($cached_settings['langcode']) && !empty($language_list[$cached_settings['langcode']])) {
-    $parts['language_obj'] = $language_list[$cached_settings['langcode']];
-  }
   else {
     // Let's see if we can split off a language prefix from the path.
     if (module_exists('locale')) {
@@ -402,6 +399,9 @@ function _pathologic_replace($matches) {
         $parts['path'] = $path;
         $parts['language_obj'] = $language_obj;
       }
+    }
+    if(empty($parts['language_obj']) && !empty($cached_settings['langcode']) && !empty($language_list[$cached_settings['langcode']])) {
+      $parts['language_obj'] = $language_list[$cached_settings['langcode']];
     }
   }
 

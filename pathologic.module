@@ -377,7 +377,7 @@ function _pathologic_replace($matches) {
   // If we didn't previously identify this as a file, check to see if the file
   // exists now that we have the correct path relative to DRUPAL_ROOT
   if (!$cached_settings['is_file']) {
-    $cached_settings['is_file'] = !empty($parts['path']) && (is_file(DRUPAL_ROOT . '/'. $parts['path']) || _pathologic_is_file_directory($parts['path']));
+    $cached_settings['is_file'] = !empty($parts['path']) && (is_file(DRUPAL_ROOT . '/' . $parts['path']) || _pathologic_is_file_directory($parts['path']));
   }
 
   // Okay, deal with language stuff.
@@ -538,17 +538,20 @@ function _pathologic_get_real_settings_source($format_name) {
  *   The path to check.
  *
  * @return bool
- *   True if the path is in the public or private directory, false otherwise.
+ *   TRUE if the path is in the public or private directory. FALSE otherwise.
  */
 function _pathologic_is_file_directory($path) {
   // Public stream wrapper: look up the path to which the stream wrapper points
   // to and compare with the start of the given path.
   /** @var DrupalLocalStreamWrapper $stream */
-  $stream = file_stream_wrapper_get_instance_by_scheme('public');
-  $dir = $stream->getDirectoryPath();
-  if (strpos($path, $dir) === 0) {
-    return TRUE;
+  if ($stream = file_stream_wrapper_get_instance_by_scheme('public')) {
+    $dir = $stream->getDirectoryPath();
+    if (strpos($path, $dir) === 0) {
+      return TRUE;
+    }
   }
+
+  // @todo Check other stream wrappers too?
 
   // Private: use the url, not the real path
   if (strpos($path, 'system/files') === 0) {

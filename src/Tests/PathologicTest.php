@@ -237,6 +237,23 @@ class PathologicTest extends WebTestBase {
       '<img src="' . _pathologic_url_to_protocol_relative(_pathologic_content_url('foo.jpeg', array('absolute' => TRUE))) . '" />',
       t('Use global settings when so configured on the format')
     );
+
+    // Test really broken URLs.
+    // @see https://www.drupal.org/node/2602312
+    $original = '<a href="/Epic:failure">foo</a>';
+    $message = t('Fails sensibly when \Drupal\Core\Url::fromUri() throws exception');
+    try {
+      $filtered = check_markup($original, $format_id);
+      $this->assertEqual(
+        $original,
+        $filtered,
+        $message
+      );
+    }
+    catch (\Exception $e) {
+      $this->fail($message);
+    }
+
   }
 
 }

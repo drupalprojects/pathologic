@@ -8,7 +8,7 @@ function pathologic_test_pathologic_alter(&$url_params, $parts, $settings) {
     if ($parts['qparts']['test'] === 'add_foo_qpart') {
       // Add a "foo" query part
       if (empty($url_params['options']['query'])) {
-        $url_params['options']['query'] = array();
+        $url_params['options']['query'] = [];
       }
       $url_params['options']['query']['foo'] = 'bar';
     }

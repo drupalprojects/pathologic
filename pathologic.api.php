@@ -65,7 +65,7 @@ function hook_pathologic_alter(&$url_params, $parts, $settings) {
 
   // If the URL doesn't have a "foo" query parameter, then add one.
   if (!is_array($url_params['options']['query'])) {
-    $url_params['options']['query'] = array();
+    $url_params['options']['query'] = [];
   }
   if (empty($url_params['options']['query']['foo'])) {
     $url_params['options']['query']['foo'] = 'bar';

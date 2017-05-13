@@ -43,9 +43,9 @@ function _pathologic_filter($text, $settings, $hash) {
   // if, for example, we're importing many nodes, and not slow things down too
   // much if it's just a one-off. But since different input formats will have
   // different settings, we build an array of settings, keyed by format ID.
-  $cached_settings = &drupal_static(__FUNCTION__, array());
+  $cached_settings = &drupal_static(__FUNCTION__, []);
   if (!isset($cached_settings[$hash])) {
-    $settings['local_paths_exploded'] = array();
+    $settings['local_paths_exploded'] = [];
     if ($settings['local_paths'] !== '') {
       // Build an array of the exploded local paths for this format's settings.
       // array_filter() below is filtering out items from the array which equal
@@ -95,8 +95,8 @@ function _pathologic_filter($text, $settings, $hash) {
       }
     }
     // Now add local paths based on "this" server URL.
-    $settings['local_paths_exploded'][] = array('path' => $base_url_parts['path']);
-    $settings['local_paths_exploded'][] = array('path' => $base_url_parts['path'], 'host' => $base_url_parts['host']);
+    $settings['local_paths_exploded'][] = ['path' => $base_url_parts['path']];
+    $settings['local_paths_exploded'][] = ['path' => $base_url_parts['path'], 'host' => $base_url_parts['host']];
     // We'll also just store the host part separately for easy access.
     $settings['base_url_host'] = $base_url_parts['host'];
 
@@ -322,9 +322,9 @@ function _pathologic_replace($matches) {
     $parts['path'] = '<front>';
   }
   // Build the parameters we will send to url()
-  $url_params = array(
+  $url_params = [
     'path' => $parts['path'],
-    'options' => array(
+    'options' => [
       'query' => $parts['qparts'],
       'fragment' => isset($parts['fragment']) ? $parts['fragment'] : NULL,
       // Create an absolute URL if protocol_style is 'full' or 'proto-rel', but
@@ -337,8 +337,8 @@ function _pathologic_replace($matches) {
       // an alter hook implementation wants us to just pass through the original
       // URL.
       'use_original' => FALSE,
-    ),
-  );
+    ],
+  ];
 
   // Add the original URL to the parts array
   $parts['original'] = $original_url;

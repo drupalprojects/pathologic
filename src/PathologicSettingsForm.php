@@ -26,15 +26,15 @@ class PathologicSettingsForm extends ConfigFormBase {
   public function buildForm(array $form, FormStateInterface $form_state) {
     $config = $this->config('pathologic.settings');
 
-    $form['reminder'] = array(
+    $form['reminder'] = [
       '#type' => 'markup',
       '#markup' => '<p>' . $this->t('Reminder: The settings on this form only affect text formats for which Pathologic is configured to use the global Pathologic settings; if it&rsquo;s configured to use per-format settings, these settings will have no effect.') . '</p>',
       '#weight' => 0,
-    );
-    $defaults = array(
+    ];
+    $defaults = [
       'protocol_style' => $config->get('protocol_style'),
       'local_paths' => $config->get('local_paths'),
-    );
+    ];
 
     $common = new PathologicSettingsCommon();
     $form += $common->commonSettingsForm($defaults);

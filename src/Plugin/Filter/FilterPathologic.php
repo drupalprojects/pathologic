@@ -42,25 +42,25 @@ class FilterPathologic extends FilterBase {
    * {@inheritdoc}
    */
   public function settingsForm(array $form, FormStateInterface $form_state) {
-    $form['reminder'] = array(
+    $form['reminder'] = [
       '#type' => 'markup',
       '#markup' => $this->t('In most cases, Pathologic should be the <em>last</em> filter in the &ldquo;Filter processing order&rdquo; list.'),
       '#weight' => 0,
-    );
-    $form['settings_source'] = array(
+    ];
+    $form['settings_source'] = [
       '#type' => 'radios',
       '#title' => $this->t('Settings source'),
-      '#description' => $this->t('Select whether Pathologic should use the <a href=":config">global Pathologic settings</a> or custom &ldquo;local&rdquo; settings when filtering text in this text format.', array(':config' => Url::fromRoute('pathologic.config_form')->toString())),
+      '#description' => $this->t('Select whether Pathologic should use the <a href=":config">global Pathologic settings</a> or custom &ldquo;local&rdquo; settings when filtering text in this text format.', [':config' => Url::fromRoute('pathologic.config_form')->toString()]),
       '#weight' => 10,
       '#default_value' => $this->settings['settings_source'],
-      '#options' => array(
+      '#options' => [
         'global' => $this->t('Use global Pathologic settings'),
         'local' => $this->t('Use custom settings for this text format'),
-      ),
-    );
+      ],
+    ];
     // Fields in fieldsets are… awkward to implement.
     // @see https://www.drupal.org/node/2378437
-    $form['local_settings'] = array(
+    $form['local_settings'] = [
       '#type' => 'fieldset',
       '#title' => $this->t('Custom settings for this text format'),
       '#weight' => 20,
@@ -68,12 +68,12 @@ class FilterPathologic extends FilterBase {
       '#collapsed' => FALSE,
       '#description' => $this->t('These settings are ignored if &ldquo;Use global Pathologic settings&rdquo; is selected above.'),
       // @todo Fix the #states magic (or see if it's a core D8 bug)
-      '#states' => array(
-        'visible' => array(
-          ':input[name="filters[filter_pathologic][settings][settings_source]"]' => array('value' => 'local'),
-        ),
-      ),
-    );
+      '#states' => [
+        'visible' => [
+          ':input[name="filters[filter_pathologic][settings][settings_source]"]' => ['value' => 'local'],
+        ],
+      ],
+    ];
 
     $common = new PathologicSettingsCommon();
     $form['local_settings'] += $common->commonSettingsForm($this->settings['local_settings']);

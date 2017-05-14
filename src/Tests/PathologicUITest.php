@@ -1,8 +1,4 @@
 <?php
-  /**
-   * @file
-   * Contains \Drupal\pathologic\Tests\PathologicUITest.
-   */
 
 namespace Drupal\pathologic\Tests;
 

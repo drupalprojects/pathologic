@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\pathologic\PathologicSettingsForm.
- */
-
 namespace Drupal\pathologic;
 
 use Drupal\Core\Form\ConfigFormBase;

@@ -1,14 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\pathologic\PathologicSettingsCommon.
- *
- * This is a hack (I think… not sure if this is a sane way to do this) in order
- * to get common field elements to show up on both the global and local filter
- * instance config forms without repeating code.
- */
-
 namespace Drupal\pathologic;
 
 use Drupal\Core\StringTranslation\StringTranslationTrait;

@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Pathologic!
- */
-
 namespace Drupal\pathologic\Plugin\Filter;
 
 use Drupal\filter\FilterProcessResult;

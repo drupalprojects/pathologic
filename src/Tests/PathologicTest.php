@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Definition of Drupal\pathologic\Tests\PathologicTest.
- */
-
 namespace Drupal\pathologic\Tests;
 
 use Drupal\Component\Utility\SafeMarkup;

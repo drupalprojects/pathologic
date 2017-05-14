@@ -23,7 +23,7 @@
  * - Alter hook alters Drupal\Core\Url object instead of method parameters.
  */
 
-use Drupal\Component\Utility\Html;
+use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Url;
 
@@ -384,7 +384,7 @@ function _pathologic_replace($matches) {
 
   // Apply HTML character encoding, as is required for HTML attributes.
   // @see http://drupal.org/node/1672932
-  $url = Html::escape($url);
+  $url = SafeMarkup::checkPlain($url);
   // $matches[1] will be the tag attribute; src, href, etc.
   return " {$matches[1]}=\"{$url}";
 }
